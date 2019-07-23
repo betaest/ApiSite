@@ -1,7 +1,10 @@
 ﻿using ApiSite.Contexts;
+using ApiSite.Models;
+
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +19,8 @@ namespace ApiSite.Controllers {
 
         #endregion Private Fields
 
+        #region Private Properties
+
         private bool Verified {
             get {
                 if (!Request.Cookies.ContainsKey("guid")) return false;
@@ -25,6 +30,8 @@ namespace ApiSite.Controllers {
                 return context.HasGuid(guid);
             }
         }
+
+        #endregion Private Properties
 
         #region Public Constructors
 
@@ -46,15 +53,15 @@ namespace ApiSite.Controllers {
 
         // GET api/values
         [HttpGet("{keyword?}")]
-        public ActionResult<Models.ProjectInfoReturn> Get(string keyword = "", int page = 1, int pageSize = 10, string sorter = "", string order = "normal") {
-            if (!Verified) return new Models.ProjectInfoReturn {
+        public ActionResult<ProjectInfoReturn> Get(string keyword = "", int page = 1, int pageSize = 10, string sorter = "", string order = "normal") {
+            if (!Verified) return new ProjectInfoReturn {
                 Total = 0,
-                Rows = new Models.ProjectInfo[0]
+                Rows = new ProjectInfo[0]
             };
 
             var row = context.GetInfoByKeyword(page - 1, pageSize, sorter, order, keyword).ToList();
 
-            return new Models.ProjectInfoReturn {
+            return new ProjectInfoReturn {
                 Total = row.Count,
                 Rows = row
             };
@@ -63,7 +70,7 @@ namespace ApiSite.Controllers {
         // POST api/values
         [HttpPost]
         public async void Post([FromForm]IFormCollection form) {
-            var info = new Models.ProjectInfo {
+            var info = new ProjectInfo {
                 Name = form["name"],
                 Department = form["department"],
                 Description = form["description"],
@@ -71,8 +78,9 @@ namespace ApiSite.Controllers {
                 Operator = form["operator"],
                 OperateDateTime = DateTime.Now,//JsonConvert.DeserializeObject<DateTime>(form["operateDateTime"]),
                 State = 'A',
-                Attachments = new List<Models.ProjectAttachment>()
             };
+
+            var attachments = new List<ProjectAttachment>();
 
             foreach (var file in form.Files) {
                 var name = Path.GetFileName(file.FileName);
@@ -81,13 +89,13 @@ namespace ApiSite.Controllers {
                 using (var fs = new FileStream($"D:\\{url}", FileMode.Create))
                     await file.CopyToAsync(fs);
 
-                info.Attachments.Add(new Models.ProjectAttachment {
+                attachments.Add(new ProjectAttachment {
                     Name = name,
                     Url = url
                 });
             }
 
-            context.AddInfo(info);
+            context.AddInfo(info, attachments);
         }
 
         // PUT api/values/5

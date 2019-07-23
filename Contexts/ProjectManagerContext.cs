@@ -1,19 +1,23 @@
-﻿using System;
+﻿using ApiSite.Models;
+
+using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ApiSite.Models;
-using Microsoft.EntityFrameworkCore;
-using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
         #region Public Constructors
 
-        public ProjectManagerContext(DbContextOptions<ProjectManagerContext> options) : base(options) { }
+        private DbSet<LogonHistory> LogonHistory { get; set; }
 
-        private DbSet<Models.ProjectInfo> ProjectInfo { get; set; }
-        private DbSet<Models.LogonHistory> LogonHistory { get; set; }
-        private DbSet<Models.ProjectAttachment> ProjectAttachment { get; set; }
+        private DbSet<ProjectAttachment> ProjectAttachment { get; set; }
+
+        private DbSet<ProjectInfo> ProjectInfo { get; set; }
+
+        public ProjectManagerContext(DbContextOptions<ProjectManagerContext> options) : base(options) {
+        }
 
         #region Overrides of DbContext
 
@@ -21,19 +25,60 @@ namespace ApiSite.Contexts {
             return base.GetHashCode();
         }
 
-        #endregion
+        #endregion Overrides of DbContext
 
         #region Overrides of DbContext
 
 #if DEBUG
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             base.OnConfiguring(optionsBuilder);
 
             optionsBuilder.EnableDetailedErrors(true).EnableSensitiveDataLogging(true);
         }
+
 #endif
 
-        #endregion
+        #endregion Overrides of DbContext
+
+        public bool AddInfo(ProjectInfo info, ICollection<ProjectAttachment> attachments = null) {
+            try {
+                //ProjectInfo.Add(info);
+                //var attachments = info.Attachments;
+
+                //info.Attachments = null;
+
+                ProjectInfo.Add(info);
+
+                if (attachments != null) {
+                    foreach (var item in attachments) {
+                        item.ProjectInfo = info;
+                    }
+
+                    ProjectAttachment.AddRange(attachments);
+                }
+
+                SaveChanges();
+
+                return true;
+            } catch (Exception e) {
+                Console.WriteLine(e);
+
+                return false;
+            }
+        }
+
+        public bool DeleteById(int id) {
+            var info = ProjectInfo.First(p => p.Id == id && p.State == 'A');
+
+            if (info == null)
+                return false;
+
+            info.State = 'X';
+            SaveChanges();
+
+            return true;
+        }
 
         public IEnumerable<Models.ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order, string keyword) {
             var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
@@ -60,36 +105,9 @@ namespace ApiSite.Contexts {
             return result;
         }
 
-        public bool DeleteById(int id) {
-            var info = ProjectInfo.First(p => p.Id == id && p.State == 'A');
-
-            if (info == null)
-                return false;
-
-            info.State = 'X';
-            SaveChanges();
-
-            return true;
-
-        }
-
         public bool HasGuid(string guid) =>
             LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
 
-        public bool AddInfo(Models.ProjectInfo info) {
-            try {
-                ProjectInfo.Add(info);
-
-                // ProjectInfo.FromSql("insert into")
-                SaveChanges();
-
-                return true;
-            } catch(Exception e) {
-                Console.WriteLine(e);
-
-                return false;
-            }
-        }
         #endregion Public Constructors
     }
 }

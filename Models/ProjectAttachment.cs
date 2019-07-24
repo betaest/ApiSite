@@ -12,8 +12,8 @@ namespace ApiSite.Models {
         [Required]
         public string Url { get; set; }
 
-        //public int ProjectInfoId { get; set; }
-        public virtual ProjectInfo ProjectInfo { get; set; }
+        public int ProjectInfoId { get; set; }
+        //public virtual ProjectInfo ProjectInfo { get; set; }
 
         #endregion Public Properties
     }

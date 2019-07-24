@@ -44,21 +44,18 @@ namespace ApiSite.Contexts {
         public bool AddInfo(ProjectInfo info, ICollection<ProjectAttachment> attachments = null) {
             try {
                 //ProjectInfo.Add(info);
-                //var attachments = info.Attachments;
 
-                //info.Attachments = null;
+                //if (attachments != null) {
+                //    foreach (var item in attachments) {
+                //        item.ProjectInfo = info;
+                //    }
 
-                ProjectInfo.Add(info);
+                //    ProjectAttachment.AddRange(attachments);
+                //}
 
-                if (attachments != null) {
-                    foreach (var item in attachments) {
-                        item.ProjectInfo = info;
-                    }
-
-                    ProjectAttachment.AddRange(attachments);
-                }
-
-                SaveChanges();
+                //SaveChanges();
+                Database.ExecuteSqlCommand(@"insert into ProjectInfo (Name, Description, Department, Handler, Operator, OperateDateTime, State)
+                                values ({info.Name}, {info.Description}, {info.Department}, {info.Handler}, {info.Operator}, {info.OperateDateTime}, {info.State})");
 
                 return true;
             } catch (Exception e) {

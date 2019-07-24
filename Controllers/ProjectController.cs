@@ -76,7 +76,7 @@ namespace ApiSite.Controllers {
                 Description = form["description"],
                 Handler = form["handler"],
                 Operator = form["operator"],
-                OperateDateTime = DateTime.Now,//JsonConvert.DeserializeObject<DateTime>(form["operateDateTime"]),
+                OperateDateTime = DateTime.Now,
                 State = 'A',
             };
 
@@ -85,7 +85,6 @@ namespace ApiSite.Controllers {
             foreach (var file in form.Files) {
                 var name = Path.GetFileName(file.FileName);
                 var url = $"{DateTime.Now:yyyyMMddHHmmss}.{Guid.NewGuid():B}{Path.GetExtension(name)}";
-                //System.IO.File.WriteAllBytes($"D:\{file.FileName}", )
                 using (var fs = new FileStream($"D:\\{url}", FileMode.Create))
                     await file.CopyToAsync(fs);
 

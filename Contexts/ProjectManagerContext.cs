@@ -1,10 +1,8 @@
-﻿using ApiSite.Models;
-
-using Microsoft.EntityFrameworkCore;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiSite.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
@@ -77,7 +75,8 @@ namespace ApiSite.Contexts {
             return true;
         }
 
-        public IEnumerable<Models.ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order, string keyword) {
+        public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
+            string keyword) {
             var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
 
             if (!string.IsNullOrEmpty(keyword))
@@ -90,7 +89,9 @@ namespace ApiSite.Contexts {
 
                     default:
                         if (sorter.ToLower() == "$custom")
-                            result = order.ToLower() == "asc" ? result.OrderBy(p => p.Department + p.Handler) : result.OrderByDescending(p => p.Department + p.Handler);
+                            result = order.ToLower() == "asc"
+                                ? result.OrderBy(p => p.Department + p.Handler)
+                                : result.OrderByDescending(p => p.Department + p.Handler);
                         else
                             result = result.OrderBy(sorter, order == "asc");
                         break;

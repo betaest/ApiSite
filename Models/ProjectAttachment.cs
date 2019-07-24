@@ -6,14 +6,9 @@ namespace ApiSite.Models {
 
         public int Id { get; set; }
 
-        [Required]
-        public string Name { get; set; }
+        [Required] public string Name { get; set; }
 
-        [Required]
-        public string Url { get; set; }
-
-        public int ProjectInfoId { get; set; }
-        //public virtual ProjectInfo ProjectInfo { get; set; }
+        [Required] public string Url { get; set; }
 
         #endregion Public Properties
     }

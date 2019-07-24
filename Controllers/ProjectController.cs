@@ -1,28 +1,34 @@
-﻿using ApiSite.Contexts;
-using ApiSite.Models;
-
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ApiSite.Contexts;
+using ApiSite.Models;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiSite.Controllers {
     [Route("p"), EnableCors("cors"), ApiController]
     public class ProjectController : ControllerBase {
-        #region Private Fields
+        #region Public Constructors
 
-        private readonly ProjectManagerContext context;
+        public ProjectController(IConfiguration cfg, IHostingEnvironment env, ProjectManagerContext context) {
+            this.env = env;
+            this.cfg = cfg;
+            this.context = context;
+        }
 
-        #endregion Private Fields
+        #endregion Public Constructors
 
         #region Private Properties
 
-        private bool Verified {
-            get {
+        private bool Verified
+        {
+            get
+            {
                 if (!Request.Cookies.ContainsKey("guid")) return false;
 
                 var guid = Request.Cookies["guid"];
@@ -33,13 +39,13 @@ namespace ApiSite.Controllers {
 
         #endregion Private Properties
 
-        #region Public Constructors
+        #region Private Fields
 
-        public ProjectController(ProjectManagerContext context) {
-            this.context = context;
-        }
+        private readonly ProjectManagerContext context;
+        private readonly IHostingEnvironment env;
+        private readonly IConfiguration cfg;
 
-        #endregion Public Constructors
+        #endregion Private Fields
 
         #region Public Methods
 
@@ -53,11 +59,14 @@ namespace ApiSite.Controllers {
 
         // GET api/values
         [HttpGet("{keyword?}")]
-        public ActionResult<ProjectInfoReturn> Get(string keyword = "", int page = 1, int pageSize = 10, string sorter = "", string order = "normal") {
-            if (!Verified) return new ProjectInfoReturn {
-                Total = 0,
-                Rows = new ProjectInfo[0]
-            };
+        public ActionResult<ProjectInfoReturn> Get(string keyword = "", int page = 1, int pageSize = 10,
+            string sorter = "", string order = "normal") {
+            if (!Verified)
+                return new ProjectInfoReturn {
+                    Total = 0,
+
+                    Rows = new ProjectInfo[0]
+                };
 
             var row = context.GetInfoByKeyword(page - 1, pageSize, sorter, order, keyword).ToList();
 
@@ -69,7 +78,9 @@ namespace ApiSite.Controllers {
 
         // POST api/values
         [HttpPost]
-        public async void Post([FromForm]IFormCollection form) {
+        public bool Post([FromForm] IFormCollection form) {
+            if (!Verified) return false;
+
             var info = new ProjectInfo {
                 Name = form["name"],
                 Department = form["department"],
@@ -78,28 +89,36 @@ namespace ApiSite.Controllers {
                 Operator = form["operator"],
                 OperateDateTime = DateTime.Now,
                 State = 'A',
+                Attachments = new List<ProjectAttachment>(),
             };
 
-            var attachments = new List<ProjectAttachment>();
+            var files = new Dictionary<string, IFormFile>();
+            var wwwroot = env.WebRootPath;
 
             foreach (var file in form.Files) {
                 var name = Path.GetFileName(file.FileName);
                 var url = $"{DateTime.Now:yyyyMMddHHmmss}.{Guid.NewGuid():B}{Path.GetExtension(name)}";
-                using (var fs = new FileStream($"D:\\{url}", FileMode.Create))
-                    await file.CopyToAsync(fs);
-
-                attachments.Add(new ProjectAttachment {
+                info.Attachments.Add(new ProjectAttachment {
                     Name = name,
                     Url = url
                 });
+                files.Add(url, file);
             }
 
-            context.AddInfo(info, attachments);
+            if (!context.AddInfo(info))
+                return false;
+
+            foreach (var (url, file) in files)
+                using (var fs = new FileStream(cfg["FileSaveTo"].Parse(new {wwwroot, url}), FileMode.Create))
+                    file.CopyTo(fs);
+
+            return true;
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value) { }
+        public void Put(int id, [FromBody] string value) {
+        }
 
         #endregion Public Methods
     }

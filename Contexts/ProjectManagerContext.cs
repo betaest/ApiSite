@@ -39,21 +39,11 @@ namespace ApiSite.Contexts {
 
         #endregion Overrides of DbContext
 
-        public bool AddInfo(ProjectInfo info, ICollection<ProjectAttachment> attachments = null) {
+        public bool AddInfo(ProjectInfo info) {
             try {
-                //ProjectInfo.Add(info);
+                ProjectInfo.Add(info);
 
-                //if (attachments != null) {
-                //    foreach (var item in attachments) {
-                //        item.ProjectInfo = info;
-                //    }
-
-                //    ProjectAttachment.AddRange(attachments);
-                //}
-
-                //SaveChanges();
-                Database.ExecuteSqlCommand(@"insert into ProjectInfo (Name, Description, Department, Handler, Operator, OperateDateTime, State)
-                                values ({info.Name}, {info.Description}, {info.Department}, {info.Handler}, {info.Operator}, {info.OperateDateTime}, {info.State})");
+                SaveChanges();
 
                 return true;
             } catch (Exception e) {

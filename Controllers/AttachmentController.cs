@@ -1,26 +1,39 @@
-﻿using System;
+﻿using System.IO;
+using ApiSite.Contexts;
 using ApiSite.Models;
+using ApiSite.Utils;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace ApiSite.Controllers {
     [Route("a"), EnableCors("cors"), ApiController]
-    public class AttachmentController: ControllerBase {
-        private ApiConf cfg;
-        private IHostingEnvironment env;
+    public class AttachmentController : ControllerBase {
+        private readonly ApiConf cfg;
+        private readonly ProjectManagerContext context;
 
-        public AttachmentController(IOptionsMonitor<ApiConf> cfg, IHostingEnvironment env) {
+        public AttachmentController(IOptionsMonitor<ApiConf> cfg, ProjectManagerContext context) {
             this.cfg = cfg.CurrentValue;
-            this.env = env;
+            this.context = context;
         }
 
-        [HttpDelete("{id}")]
-        public MessageResult Delete(int fileId) {
-            return null;
+        [HttpGet("{id}")]
+        public object Download(int id) {
+            var attachment = context.GetFile(id);
+
+            if (attachment == default)
+                return new MessageResult {
+                    Success = false,
+                    Message = "下载文件未找到"
+                };
+
+            var file = System.IO.File.ReadAllBytes($"{cfg.SavePath}/{attachment.Url}");
+            var ext = Path.GetExtension(attachment.Name);
+            var mimeType = Helper.MimeTypes.ContainsKey(ext.ToLower())
+                ? Helper.MimeTypes[ext.ToLower()]
+                : "application/octet-stream";
+
+            return File(file, mimeType, attachment.Name);
         }
     }
 }

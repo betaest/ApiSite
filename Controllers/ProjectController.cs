@@ -1,25 +1,21 @@
-﻿using ApiSite.Contexts;
-using ApiSite.Models;
-using ApiSite.Utils;
-
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ApiSite.Contexts;
+using ApiSite.Models;
+using ApiSite.Utils;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace ApiSite.Controllers {
     [Route("p"), EnableCors("cors"), ApiController]
     public class ProjectController : ControllerBase {
         #region Public Constructors
 
-        public ProjectController(IOptionsMonitor<ApiConf> cfg, IHostingEnvironment env, ProjectManagerContext context) {
-            this.env = env;
+        public ProjectController(IOptionsMonitor<ApiConf> cfg, ProjectManagerContext context) {
             this.cfg = cfg.CurrentValue;
             this.context = context;
         }
@@ -28,8 +24,10 @@ namespace ApiSite.Controllers {
 
         #region Private Properties
 
-        private bool Verified {
-            get {
+        private bool Verified
+        {
+            get
+            {
                 if (!Request.Cookies.ContainsKey("guid")) return false;
 
                 var guid = Request.Cookies["guid"];
@@ -51,7 +49,7 @@ namespace ApiSite.Controllers {
 
         [NonAction]
         private MessageResult PostOrPutContent(IFormCollection form, Func<ProjectInfo, bool> callback) {
-            if (!Verified) return VerifyError;
+            if (!Verified) return verifyError;
 
             var info = new ProjectInfo {
                 Id = int.TryParse(form["id"], out var id) ? id : default,
@@ -66,11 +64,10 @@ namespace ApiSite.Controllers {
             };
 
             var files = new Dictionary<string, IFormFile>();
-            var wwwroot = env.ContentRootPath;
 
             foreach (var file in form.Files) {
                 var name = Path.GetFileName(file.FileName);
-                var url = $"{DateTime.Now:yyyyMMddHHmmss}.{Guid.NewGuid():B}{Path.GetExtension(name)}";
+                var url = $"{Helper.GenerateFilename(cfg.NameRule)}{Path.GetExtension(name)}";
                 info.Attachments.Add(new ProjectAttachment {
                     Name = name,
                     Url = url,
@@ -93,30 +90,13 @@ namespace ApiSite.Controllers {
 
         #region Private Fields
 
-        private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string> {
-            {".txt", "text/plain"},
-            {".pdf", "application/pdf"},
-            {".doc", "application/vnd.ms-word"},
-            {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
-            {".xls", "application/vnd.ms-excel"},
-            {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
-            {".ppt", "application/vnd.ms-powerpoint" },
-            {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
-            {".png", "image/png"},
-            {".jpg", "image/jpeg"},
-            {".jpeg", "image/jpeg"},
-            {".gif", "image/gif"},
-            {".csv", "text/csv"}
-        };
-
-        private static readonly MessageResult VerifyError = new MessageResult {
+        private static readonly MessageResult verifyError = new MessageResult {
             Success = false,
             Message = "身份验证失败，请重新登录"
         };
 
         private readonly ApiConf cfg;
         private readonly ProjectManagerContext context;
-        private readonly IHostingEnvironment env;
 
         #endregion Private Fields
 
@@ -125,7 +105,7 @@ namespace ApiSite.Controllers {
         // DELETE api/values/5
         [HttpDelete("{id}")]
         public MessageResult Delete(int id) {
-            if (!Verified) return VerifyError;
+            if (!Verified) return verifyError;
 
             var success = context.DeleteById(id);
 
@@ -136,9 +116,6 @@ namespace ApiSite.Controllers {
         [HttpGet("{keyword?}")]
         public ProjectInfoReturn Get(string keyword = "", int page = 1, int pageSize = 10,
             string sorter = "", string order = "normal") {
-
-            var url = cfg.NameRule.Format(new { now = DateTime.Now, guid = Guid.NewGuid() });
-
             if (!Verified)
                 return new ProjectInfoReturn {
                     Total = 0,

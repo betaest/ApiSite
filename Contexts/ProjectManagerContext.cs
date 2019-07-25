@@ -1,27 +1,40 @@
-﻿using ApiSite.Models;
-
-using Microsoft.EntityFrameworkCore;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiSite.Models;
+using ApiSite.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
-        #region Private Properties
-
-        private DbSet<LogonHistory> LogonHistory { get; set; }
-
-        private DbSet<ProjectInfo> ProjectInfo { get; set; }
-
-        #endregion Private Properties
-
         #region Public Constructors
 
         public ProjectManagerContext(DbContextOptions<ProjectManagerContext> options) : base(options) {
         }
 
         #endregion Public Constructors
+
+        #region Overrides of DbContext
+
+#if DEBUG
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            base.OnConfiguring(optionsBuilder);
+
+            optionsBuilder.EnableDetailedErrors(true).EnableSensitiveDataLogging(true);
+        }
+
+#endif
+
+        #endregion Overrides of DbContext
+
+        #region Private Properties
+
+        private DbSet<LogonHistory> LogonHistory { get; set; }
+        private DbSet<ProjectAttachment> ProjectAttachment { get; set; }
+        private DbSet<ProjectInfo> ProjectInfo { get; set; }
+
+        #endregion Private Properties
 
         #region Public Methods
 
@@ -91,6 +104,12 @@ namespace ApiSite.Contexts {
         public bool HasGuid(string guid) =>
             LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
 
+        public ProjectAttachment GetFile(int fileId) =>
+            ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
+
+        public List<ProjectAttachment> GetFiles(int id) =>
+            ProjectInfo.FirstOrDefault(p => p.Id == id && p.State == 'A')?.Attachments?.ToList();
+
         public bool UpdateInfo(ProjectInfo info) {
             var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');
 
@@ -119,19 +138,5 @@ namespace ApiSite.Contexts {
         }
 
         #endregion Public Methods
-
-        #region Overrides of DbContext
-
-#if DEBUG
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            base.OnConfiguring(optionsBuilder);
-
-            optionsBuilder.EnableDetailedErrors(true).EnableSensitiveDataLogging(true);
-        }
-
-#endif
-
-        #endregion Overrides of DbContext
     }
 }

@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using ApiSite.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class VerifyContext : DbContext {
-        #region Public Constructors
-
-        public VerifyContext(DbContextOptions<VerifyContext> options) : base(options) { }
-
-        #endregion Public Constructors
-
-        private DbSet<Models.LogonHistory> LogonHistory { get; set; }
-
-        private static readonly Models.VerifyReturn failure = new Models.VerifyReturn {
+        private static readonly VerifyReturn failure = new VerifyReturn {
             Success = false,
             Name = string.Empty,
             Guid = string.Empty
         };
 
-        public Models.VerifyReturn Verify(string token) {
+        #region Public Constructors
+
+        public VerifyContext(DbContextOptions<VerifyContext> options) : base(options) {
+        }
+
+        #endregion Public Constructors
+
+        private DbSet<LogonHistory> LogonHistory { get; set; }
+
+        public VerifyReturn Verify(string token) {
             var existed = LogonHistory.Any(l => l.Token == token && l.State == 'A');
 
             if (existed) return failure;
@@ -27,9 +29,10 @@ namespace ApiSite.Contexts {
             try {
                 var guid = Guid.NewGuid().ToString();
 
-                var tokenString = Encoding.UTF8.GetString(Convert.FromBase64String(token)).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var tokenString = Encoding.UTF8.GetString(Convert.FromBase64String(token))
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-                LogonHistory.Add(new Models.LogonHistory {
+                LogonHistory.Add(new LogonHistory {
                     Token = token,
                     StaffId = int.Parse(tokenString[0]),
                     StaffName = tokenString[1],
@@ -41,7 +44,7 @@ namespace ApiSite.Contexts {
 
                 this.SaveChanges();
 
-                return new Models.VerifyReturn {
+                return new VerifyReturn {
                     Success = true,
                     Name = tokenString[1],
                     Guid = guid
@@ -53,6 +56,5 @@ namespace ApiSite.Contexts {
 
         public bool HasGuid(string guid) =>
             LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
-
     }
 }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ApiSite.Utils {
-
-    public delegate string CustomFormatter(string id, string format, bool isLeftJustify, int width, object arg, bool dummy);
+    public delegate string CustomFormatter(string id, string format, bool isLeftJustify, int width, object arg,
+        bool dummy);
 
     public interface ICustomFormatter {
         #region Public Properties
@@ -17,8 +20,45 @@ namespace ApiSite.Utils {
     }
 
     public static class Helper {
+        public static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string> {
+            {".txt", "text/plain"},
+            {".pdf", "application/pdf"},
+            {".doc", "application/vnd.ms-word"},
+            {".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            {".xls", "application/vnd.ms-excel"},
+            {".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            {".ppt", "application/vnd.ms-powerpoint"},
+            {".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"},
+            {".png", "image/png"},
+            {".jpg", "image/jpeg"},
+            {".jpeg", "image/jpeg"},
+            {".gif", "image/gif"},
+            {".csv", "text/csv"},
+            {".zip", "application/zip" },
+        };
+
         private static void FormatError() {
             throw new FormatException("源格式字符串出错");
+        }
+
+        public static string GenerateFilename(string pattern) =>
+            Format(pattern, new {
+                now = DateTime.Now,
+                guid = Guid.NewGuid(),
+            });
+
+        public static IOrderedQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> source,
+            string orderByProperty, bool desc) {
+            var command = desc ? "OrderByDescending" : "OrderBy";
+            var type = typeof(TEntity);
+            var property = type.GetProperty(orderByProperty,
+                BindingFlags.IgnoreCase | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+            var parameter = Expression.Parameter(type, "p");
+            var propertyAccess = Expression.MakeMemberAccess(parameter, property);
+            var orderByExpression = Expression.Lambda(propertyAccess, parameter);
+            var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] {type, property.PropertyType},
+                source.Expression, Expression.Quote(orderByExpression));
+            return (IOrderedQueryable<TEntity>) source.Provider.CreateQuery<TEntity>(resultExpression);
         }
 
         #region string的扩展函数：包含Like, Format
@@ -44,7 +84,8 @@ namespace ApiSite.Utils {
         /// <param name="throwable">在参数不存在的情况下是否抛出异常，默认抛出</param>
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
-        public static string Format<T>(this string me, Dictionary<string, T> args, ICustomFormatter format = null, bool throwable = true)
+        public static string Format<T>(this string me, Dictionary<string, T> args, ICustomFormatter format = null,
+            bool throwable = true)
             => Format(me, Data.FromDictionary(args), format, throwable);
 
         /// <summary>
@@ -68,7 +109,8 @@ namespace ApiSite.Utils {
         /// <param name="throwable">在参数不存在的情况下是否抛出异常，默认抛出</param>
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
-        public static string Format<T>(this string me, Dictionary<string, T> args, CustomFormatter format, bool throwable = true)
+        public static string Format<T>(this string me, Dictionary<string, T> args, CustomFormatter format,
+            bool throwable = true)
             => Format(me, Data.FromDictionary(args), format, throwable);
 
         /// <summary>
@@ -94,13 +136,13 @@ namespace ApiSite.Utils {
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
         public static string Format(this string me, Data args, CustomFormatter format, bool throwable = true) {
             //Thrower.NullThrow(me, nameof(me));
-            if (string.IsNullOrEmpty(me)) throw new ArgumentNullException(nameof(me));
+            if (String.IsNullOrEmpty(me)) throw new ArgumentNullException(nameof(me));
 
-            if (string.IsNullOrWhiteSpace(me) || args == null || args.Count == 0)
+            if (String.IsNullOrWhiteSpace(me) || args == null || args.Count == 0)
                 return me;
 
             var len = me.Length;
-            var buffer = StringBuilderCache.Acquire((ushort)(len + args.Count * 3));
+            var buffer = StringBuilderCache.Acquire((ushort) (len + args.Count * 3));
             var pos = 0;
             var ch = '\x0';
 
@@ -131,7 +173,7 @@ namespace ApiSite.Utils {
                             break;
                         pos++;
 
-                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         if (!(pos != len && (ch = fmt[pos]) != ':' && ch != '}' && ch != ','))
@@ -152,11 +194,11 @@ namespace ApiSite.Utils {
                         var id = StringBuilderCache.GetStringAndRelease(idSb);
 
                         if (throwable && !args.HasIndex(id))
-                                throw new IndexOutOfRangeException($"{id} 超出索引");
+                            throw new IndexOutOfRangeException($"{id} 超出索引");
 
                         var arg = args.HasIndex(id) ? args[id] : $"{{{id}}}";
 
-                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         var leftJustify = false;
@@ -164,7 +206,7 @@ namespace ApiSite.Utils {
 
                         if (ch == ',') {
                             pos++;
-                            while (pos < len && char.IsWhiteSpace(fmt[pos]))
+                            while (pos < len && Char.IsWhiteSpace(fmt[pos]))
                                 pos++;
 
                             if (pos == len) FormatError();
@@ -191,7 +233,7 @@ namespace ApiSite.Utils {
                             } while (ch >= '0' && ch <= '9' && width < 1000000);
                         }
 
-                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         StringBuilder addition = null;
@@ -227,8 +269,8 @@ namespace ApiSite.Utils {
                         if (ch != '}') FormatError();
 
                         pos++;
-                        var customFormat = (string)null;
-                        var s = (string)null;
+                        var customFormat = (string) null;
+                        var s = (string) null;
 
                         if (addition != null)
                             customFormat = StringBuilderCache.GetStringAndRelease(addition).Trim();
@@ -278,7 +320,8 @@ namespace ApiSite.Utils {
             return Regex.IsMatch(me, wildcards, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
         }
 
-        public static bool NotLike(this string me, string wildcards, bool ignoreCase = true) => !Like(me, wildcards, ignoreCase);
+        public static bool NotLike(this string me, string wildcards, bool ignoreCase = true) =>
+            !Like(me, wildcards, ignoreCase);
 
         #endregion string的扩展函数：包含Like, Format
     }

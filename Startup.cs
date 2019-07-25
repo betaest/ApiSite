@@ -58,6 +58,7 @@ namespace ApiSite {
                 .AddDbContext<VerifyContext>(o => o.UseMySql(verify,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
                     policy => policy.WithOrigins("http://localhost:8080")

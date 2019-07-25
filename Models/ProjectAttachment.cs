@@ -10,6 +10,8 @@ namespace ApiSite.Models {
 
         [Required] public string Url { get; set; }
 
+        [Required] public char State { get; set; }
+
         #endregion Public Properties
     }
 }

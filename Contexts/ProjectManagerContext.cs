@@ -1,43 +1,29 @@
-﻿using System;
+﻿using ApiSite.Models;
+
+using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ApiSite.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
-        #region Public Constructors
+        #region Private Properties
 
         private DbSet<LogonHistory> LogonHistory { get; set; }
 
-        private DbSet<ProjectAttachment> ProjectAttachment { get; set; }
-
         private DbSet<ProjectInfo> ProjectInfo { get; set; }
+
+        #endregion Private Properties
+
+        #region Public Constructors
 
         public ProjectManagerContext(DbContextOptions<ProjectManagerContext> options) : base(options) {
         }
 
-        #region Overrides of DbContext
+        #endregion Public Constructors
 
-        public override int GetHashCode() {
-            return base.GetHashCode();
-        }
-
-        #endregion Overrides of DbContext
-
-        #region Overrides of DbContext
-
-#if DEBUG
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            base.OnConfiguring(optionsBuilder);
-
-            optionsBuilder.EnableDetailedErrors(true).EnableSensitiveDataLogging(true);
-        }
-
-#endif
-
-        #endregion Overrides of DbContext
+        #region Public Methods
 
         public bool AddInfo(ProjectInfo info) {
             try {
@@ -54,15 +40,24 @@ namespace ApiSite.Contexts {
         }
 
         public bool DeleteById(int id) {
-            var info = ProjectInfo.First(p => p.Id == id && p.State == 'A');
+            try {
+                var info = ProjectInfo.First(p => p.Id == id && p.State == 'A');
 
-            if (info == null)
+                if (info == null)
+                    return false;
+
+                info.State = 'X';
+
+                if (info.Attachments != null)
+                    foreach (var a in info.Attachments)
+                        a.State = 'X';
+
+                SaveChanges();
+
+                return true;
+            } catch {
                 return false;
-
-            info.State = 'X';
-            SaveChanges();
-
-            return true;
+            }
         }
 
         public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
@@ -96,6 +91,47 @@ namespace ApiSite.Contexts {
         public bool HasGuid(string guid) =>
             LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
 
-        #endregion Public Constructors
+        public bool UpdateInfo(ProjectInfo info) {
+            var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');
+
+            if (pr == default(ProjectInfo)) return false;
+
+            try {
+                pr.Name = info.Name;
+                pr.Department = info.Department;
+                pr.Description = info.Description;
+                pr.Handler = info.Handler;
+                pr.Operator = info.Operator;
+                pr.OperateDateTime = info.OperateDateTime;
+
+                if (pr.Attachments == null)
+                    pr.Attachments = info.Attachments;
+                else
+                    foreach (var a in info.Attachments)
+                        pr.Attachments.Add(a);
+
+                SaveChanges();
+
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        #endregion Public Methods
+
+        #region Overrides of DbContext
+
+#if DEBUG
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            base.OnConfiguring(optionsBuilder);
+
+            optionsBuilder.EnableDetailedErrors(true).EnableSensitiveDataLogging(true);
+        }
+
+#endif
+
+        #endregion Overrides of DbContext
     }
 }

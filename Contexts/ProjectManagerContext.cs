@@ -73,6 +73,15 @@ namespace ApiSite.Contexts {
             }
         }
 
+        public void DeleteFile(int id) {
+            var attachment = ProjectAttachment.First(pa => pa.Id == id && pa.State == 'A');
+
+            if (attachment != default) {
+                attachment.State = 'X';
+                SaveChanges();
+            }
+        }
+
         public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
             string keyword) {
             var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
@@ -108,7 +117,7 @@ namespace ApiSite.Contexts {
             ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
 
         public List<ProjectAttachment> GetFiles(int id) =>
-            ProjectInfo.FirstOrDefault(p => p.Id == id && p.State == 'A')?.Attachments?.ToList();
+            ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
 
         public bool UpdateInfo(ProjectInfo info) {
             var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');

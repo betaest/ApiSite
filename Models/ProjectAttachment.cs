@@ -12,6 +12,8 @@ namespace ApiSite.Models {
 
         [Required] public char State { get; set; }
 
+        [Required] public int ProjectInfoId { get; set; }
+
         #endregion Public Properties
     }
 }

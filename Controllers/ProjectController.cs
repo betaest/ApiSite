@@ -43,7 +43,7 @@ namespace ApiSite.Controllers {
         private static MessageResult ReturnMessage(bool success) {
             return new MessageResult {
                 Success = success,
-                Message = success ? "保存成功" : "保存数据失败"
+                Message = success ? "提交数据成功" : "提交数据失败"
             };
         }
 

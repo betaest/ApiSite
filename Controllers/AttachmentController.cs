@@ -12,6 +12,11 @@ namespace ApiSite.Controllers {
         private readonly ApiConf cfg;
         private readonly ProjectManagerContext context;
 
+        private static readonly MessageResult downloadFailure = new MessageResult {
+            Success = false,
+            Message = "下载文件未找到"
+        };
+
         public AttachmentController(IOptionsMonitor<ApiConf> cfg, ProjectManagerContext context) {
             this.cfg = cfg.CurrentValue;
             this.context = context;
@@ -22,18 +27,19 @@ namespace ApiSite.Controllers {
             var attachment = context.GetFile(id);
 
             if (attachment == default)
-                return new MessageResult {
-                    Success = false,
-                    Message = "下载文件未找到"
-                };
+                return downloadFailure;
 
-            var file = System.IO.File.ReadAllBytes($"{cfg.SavePath}/{attachment.Url}");
-            var ext = Path.GetExtension(attachment.Name);
-            var mimeType = Helper.MimeTypes.ContainsKey(ext.ToLower())
-                ? Helper.MimeTypes[ext.ToLower()]
-                : "application/octet-stream";
+            try {
+                var file = System.IO.File.ReadAllBytes($"{cfg.SavePath}/{attachment.Url}");
+                var ext = Path.GetExtension(attachment.Name);
+                var mimeType = Helper.MimeTypes.ContainsKey(ext.ToLower())
+                    ? Helper.MimeTypes[ext.ToLower()]
+                    : "application/octet-stream";
 
-            return File(file, mimeType, attachment.Name);
+                return File(file, mimeType, attachment.Name);
+            } catch {
+                return downloadFailure;
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using ApiSite.Contexts;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,12 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace ApiSite {
     public class Startup {
+        #region Private Fields
+
+        private static readonly LoggerFactory factory = new LoggerFactory(new[] {new DebugLoggerProvider()});
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         public Startup(IConfiguration configuration) {
@@ -26,12 +31,6 @@ namespace ApiSite {
         public IConfiguration Configuration { get; }
 
         #endregion Public Properties
-
-        #region Private Fields
-
-        private static readonly LoggerFactory factory = new LoggerFactory(new[] { new DebugLoggerProvider() });
-
-        #endregion Private Fields
 
         #region Public Methods
 
@@ -53,7 +52,8 @@ namespace ApiSite {
             var verify = Configuration.GetConnectionString("Verify");
 
             services.AddDbContext<ProjectManagerContext>(o =>
-                    o.UseMySql(conn, mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb))
+                    o.UseMySql(conn,
+                            mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb))
                         .UseLoggerFactory(factory))
                 .AddDbContext<VerifyContext>(o => o.UseMySql(verify,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)));
@@ -61,10 +61,7 @@ namespace ApiSite {
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
-                    policy => policy.WithOrigins("http://localhost:8080")
-                                    .WithMethods("*")
-                                    .WithHeaders("*")
-                                    .AllowCredentials()));
+                    policy => policy.WithOrigins("http://132.232.28.32:8090").AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
         }
 
         #endregion Public Methods

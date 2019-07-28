@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using ApiSite.Contexts;
+using ApiSite.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiSite.Controllers {
@@ -6,13 +8,13 @@ namespace ApiSite.Controllers {
     public class VerifyController : ControllerBase {
         #region Private Fields
 
-        private readonly Contexts.VerifyContext context;
+        private readonly VerifyContext context;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public VerifyController(Contexts.VerifyContext context) {
+        public VerifyController(VerifyContext context) {
             this.context = context;
         }
 
@@ -22,8 +24,8 @@ namespace ApiSite.Controllers {
 
         // GET: api/Verify
         [HttpGet("{token}")]
-        public ActionResult<Models.VerifyReturn> Get(string token) {
-            return this.context.Verify(token);
+        public ActionResult<VerifyReturn> Get(string token) {
+            return context.Verify(token);
         }
 
         #endregion Public Methods

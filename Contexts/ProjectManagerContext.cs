@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ApiSite.Models;
+using ApiSite.Utils;
+
+using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ApiSite.Models;
-using ApiSite.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
@@ -82,12 +84,22 @@ namespace ApiSite.Contexts {
             }
         }
 
+        public ProjectAttachment GetFile(int fileId) =>
+            ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
+
+        public List<ProjectAttachment> GetFiles(int id) =>
+            ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
+
         public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
-            string keyword) {
+                            string keyword) {
             var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
 
-            if (!string.IsNullOrEmpty(keyword))
-                result = result.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword));
+            if (!string.IsNullOrEmpty(keyword)) {
+                var ks = keyword.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var k in ks)
+                    result = result.Where(p => p.Name.Contains(k) || p.Description.Contains(k) || p.Department.Contains(k) || p.Handler.Contains(k));
+            }
 
             if (!string.IsNullOrEmpty(sorter) && !string.IsNullOrEmpty(order)) {
                 switch (order.ToLower()) {
@@ -112,12 +124,6 @@ namespace ApiSite.Contexts {
 
         public bool HasGuid(string guid) =>
             LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
-
-        public ProjectAttachment GetFile(int fileId) =>
-            ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
-
-        public List<ProjectAttachment> GetFiles(int id) =>
-            ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
 
         public bool UpdateInfo(ProjectInfo info) {
             var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');

@@ -34,18 +34,19 @@ namespace ApiSite.Utils {
             {".jpeg", "image/jpeg"},
             {".gif", "image/gif"},
             {".csv", "text/csv"},
-            {".zip", "application/zip" },
+            {".zip", "application/zip"}
         };
 
         private static void FormatError() {
             throw new FormatException("源格式字符串出错");
         }
 
-        public static string GenerateFilename(string pattern) =>
-            Format(pattern, new {
+        public static string GenerateFilename(string pattern) {
+            return Format(pattern, new {
                 now = DateTime.Now,
-                guid = Guid.NewGuid(),
+                guid = Guid.NewGuid()
             });
+        }
 
         public static IOrderedQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> source,
             string orderByProperty, bool desc) {
@@ -53,10 +54,14 @@ namespace ApiSite.Utils {
             var type = typeof(TEntity);
             var property = type.GetProperty(orderByProperty,
                 BindingFlags.IgnoreCase | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance);
+
+            if (property == null)
+                return null;
+
             var parameter = Expression.Parameter(type, "p");
             var propertyAccess = Expression.MakeMemberAccess(parameter, property);
             var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-            var resultExpression = Expression.Call(typeof(Queryable), command, new Type[] {type, property.PropertyType},
+            var resultExpression = Expression.Call(typeof(Queryable), command, new[] {type, property.PropertyType},
                 source.Expression, Expression.Quote(orderByExpression));
             return (IOrderedQueryable<TEntity>) source.Provider.CreateQuery<TEntity>(resultExpression);
         }
@@ -72,8 +77,10 @@ namespace ApiSite.Utils {
         /// <param name="throwable">在参数不存在的情况下是否抛出异常，默认抛出</param>
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
-        public static string Format(this string me, object args, ICustomFormatter format = null, bool throwable = true)
-            => Format(me, Data.FromObject(args), format, throwable);
+        public static string Format(this string me, object args, ICustomFormatter format = null,
+            bool throwable = true) {
+            return Format(me, Data.FromObject(args), format, throwable);
+        }
 
         /// <summary>
         ///     格式化字符串，与<see cref="T:String.Format" />拥有相同的格式化说明
@@ -85,8 +92,9 @@ namespace ApiSite.Utils {
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
         public static string Format<T>(this string me, Dictionary<string, T> args, ICustomFormatter format = null,
-            bool throwable = true)
-            => Format(me, Data.FromDictionary(args), format, throwable);
+            bool throwable = true) {
+            return Format(me, Data.FromDictionary(args), format, throwable);
+        }
 
         /// <summary>
         ///     格式化字符串，与<see cref="T:String.Format" />拥有相同的格式化说明
@@ -97,8 +105,9 @@ namespace ApiSite.Utils {
         /// <param name="throwable">在参数不存在的情况下是否抛出异常，默认抛出</param>
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
-        public static string Format(this string me, object args, CustomFormatter format, bool throwable = true)
-            => Format(me, Data.FromObject(args), format, throwable);
+        public static string Format(this string me, object args, CustomFormatter format, bool throwable = true) {
+            return Format(me, Data.FromObject(args), format, throwable);
+        }
 
         /// <summary>
         ///     格式化字符串，与<see cref="T:String.Format" />拥有相同的格式化说明
@@ -110,8 +119,9 @@ namespace ApiSite.Utils {
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
         public static string Format<T>(this string me, Dictionary<string, T> args, CustomFormatter format,
-            bool throwable = true)
-            => Format(me, Data.FromDictionary(args), format, throwable);
+            bool throwable = true) {
+            return Format(me, Data.FromDictionary(args), format, throwable);
+        }
 
         /// <summary>
         ///     格式化字符串，与<see cref="T:String.Format" />拥有相同的格式化说明
@@ -122,8 +132,9 @@ namespace ApiSite.Utils {
         /// <param name="throwable">在参数不存在的情况下是否抛出异常，默认抛出</param>
         /// <returns>经过格式化后的字符串</returns>
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
-        public static string Format(this string me, Data args, ICustomFormatter format = null, bool throwable = true)
-            => Format(me, args, format?.Format, throwable);
+        public static string Format(this string me, Data args, ICustomFormatter format = null, bool throwable = true) {
+            return Format(me, args, format?.Format, throwable);
+        }
 
         /// <summary>
         ///     格式化字符串，与<see cref="T:String.Format" />拥有相同的格式化说明
@@ -136,9 +147,9 @@ namespace ApiSite.Utils {
         /// <example>"{参数,宽度(-前导为左对齐):格式化字符串}"</example>
         public static string Format(this string me, Data args, CustomFormatter format, bool throwable = true) {
             //Thrower.NullThrow(me, nameof(me));
-            if (String.IsNullOrEmpty(me)) throw new ArgumentNullException(nameof(me));
+            if (string.IsNullOrEmpty(me)) throw new ArgumentNullException(nameof(me));
 
-            if (String.IsNullOrWhiteSpace(me) || args == null || args.Count == 0)
+            if (string.IsNullOrWhiteSpace(me) || args == null || args.Count == 0)
                 return me;
 
             var len = me.Length;
@@ -160,8 +171,9 @@ namespace ApiSite.Utils {
 
                             if (ch == '{')
                                 if (pos < len && fmt[pos] == '{') // Treat as escape character for {{
+                                {
                                     pos++;
-                                else {
+                                } else {
                                     pos--;
                                     break;
                                 }
@@ -173,7 +185,7 @@ namespace ApiSite.Utils {
                             break;
                         pos++;
 
-                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         if (!(pos != len && (ch = fmt[pos]) != ':' && ch != '}' && ch != ','))
@@ -198,7 +210,7 @@ namespace ApiSite.Utils {
 
                         var arg = args.HasIndex(id) ? args[id] : $"{{{id}}}";
 
-                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         var leftJustify = false;
@@ -206,7 +218,7 @@ namespace ApiSite.Utils {
 
                         if (ch == ',') {
                             pos++;
-                            while (pos < len && Char.IsWhiteSpace(fmt[pos]))
+                            while (pos < len && char.IsWhiteSpace(fmt[pos]))
                                 pos++;
 
                             if (pos == len) FormatError();
@@ -233,7 +245,7 @@ namespace ApiSite.Utils {
                             } while (ch >= '0' && ch <= '9' && width < 1000000);
                         }
 
-                        while (pos < len && Char.IsWhiteSpace(ch = fmt[pos]))
+                        while (pos < len && char.IsWhiteSpace(ch = fmt[pos]))
                             pos++;
 
                         StringBuilder addition = null;
@@ -252,8 +264,9 @@ namespace ApiSite.Utils {
                                     pos++;
                                 } else if (ch == '}') {
                                     if (pos < len && fmt[pos] == '}') // Treat as escape character for }}
+                                    {
                                         pos++;
-                                    else {
+                                    } else {
                                         pos--;
                                         break;
                                     }
@@ -314,14 +327,15 @@ namespace ApiSite.Utils {
                 @"\\\[(.+?)\]", m => {
                     var context = m.Groups[1].Value;
 
-                    return $"(?:{context.Replace("\\|", "|")}){(!context.Contains("|") ? "?" : String.Empty)}";
+                    return $"(?:{context.Replace("\\|", "|")}){(!context.Contains("|") ? "?" : string.Empty)}";
                 });
 
             return Regex.IsMatch(me, wildcards, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
         }
 
-        public static bool NotLike(this string me, string wildcards, bool ignoreCase = true) =>
-            !Like(me, wildcards, ignoreCase);
+        public static bool NotLike(this string me, string wildcards, bool ignoreCase = true) {
+            return !Like(me, wildcards, ignoreCase);
+        }
 
         #endregion string的扩展函数：包含Like, Format
     }

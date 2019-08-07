@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace ApiSite.Controllers {
-    [Route("a"), EnableCors("cors"), ApiController]
+    [Route("a")]
+    [EnableCors("cors")]
+    [ApiController]
     public class AttachmentController : ControllerBase {
         private static readonly MessageResult downloadFailure = new MessageResult {
             Success = false,

@@ -1,11 +1,9 @@
-﻿using ApiSite.Models;
-using ApiSite.Utils;
-
-using Microsoft.EntityFrameworkCore;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ApiSite.Models;
+using ApiSite.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class ProjectManagerContext : DbContext {
@@ -19,7 +17,6 @@ namespace ApiSite.Contexts {
         #region Overrides of DbContext
 
 #if DEBUG
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             base.OnConfiguring(optionsBuilder);
 
@@ -84,24 +81,28 @@ namespace ApiSite.Contexts {
             }
         }
 
-        public ProjectAttachment GetFile(int fileId) =>
-            ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
+        public ProjectAttachment GetFile(int fileId) {
+            return ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
+        }
 
-        public List<ProjectAttachment> GetFiles(int id) =>
-            ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
+        public List<ProjectAttachment> GetFiles(int id) {
+            return ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
+        }
 
         public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
-                            string keyword) {
+            string keyword) {
             var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
 
             if (!string.IsNullOrEmpty(keyword)) {
                 var ks = keyword.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var k in ks)
-                    result = result.Where(p => p.Name.Contains(k) || p.Description.Contains(k) || p.Department.Contains(k) || p.Handler.Contains(k));
+                result = ks.Aggregate(result,
+                    (current, k) => current.Where(p =>
+                        p.Name.Contains(k) || p.Description.Contains(k) || p.Department.Contains(k) ||
+                        p.Handler.Contains(k)));
             }
 
-            if (!string.IsNullOrEmpty(sorter) && !string.IsNullOrEmpty(order)) {
+            if (!string.IsNullOrEmpty(sorter) && !string.IsNullOrEmpty(order))
                 switch (order.ToLower()) {
                     case "normal":
                         break;
@@ -115,15 +116,15 @@ namespace ApiSite.Contexts {
                             result = result.OrderBy(sorter, order == "asc");
                         break;
                 }
-            }
 
             result = result.Skip(page * pageSize).Take(pageSize);
 
             return result;
         }
 
-        public bool HasGuid(string guid) =>
-            LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        public bool HasGuid(string guid) {
+            return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        }
 
         public bool UpdateInfo(ProjectInfo info) {
             var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');

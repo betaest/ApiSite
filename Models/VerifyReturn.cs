@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApiSite.Models {
+﻿namespace ApiSite.Models {
     public class VerifyReturn {
         #region Public Properties
 
@@ -9,13 +7,5 @@ namespace ApiSite.Models {
         public bool Success { get; set; }
 
         #endregion Public Properties
-    }
-
-    public class Token {
-        public string StaffId { get; set; }
-        public string StaffName { get; set; }
-        public string IpAddress { get; set; }
-        public DateTime TokenTime { get; set; }
-        public string To { get; set; }
     }
 }

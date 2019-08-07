@@ -36,11 +36,10 @@ namespace ApiSite {
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
-            if (env.IsDevelopment()) {
+            if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
-            } else {
+            else
                 app.UseHsts();
-            }
 
             app.UseHttpsRedirection();
             app.UseMvc();
@@ -61,7 +60,8 @@ namespace ApiSite {
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
-                    policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader().AllowCredentials()));
+                    policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader()
+                        .AllowCredentials()));
         }
 
         #endregion Public Methods

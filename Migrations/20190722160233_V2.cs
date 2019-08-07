@@ -2,87 +2,73 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ApiSite.Migrations
-{
-    public partial class V2 : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+namespace ApiSite.Migrations {
+    public partial class V2 : Migration {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
-                name: "LogonHistory",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
+                "LogonHistory",
+                table => new {
+                    Id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Token = table.Column<string>(nullable: false),
-                    StaffId = table.Column<int>(nullable: false),
-                    StaffName = table.Column<string>(nullable: false),
-                    IpAddr = table.Column<string>(nullable: false),
-                    Date = table.Column<DateTime>(nullable: false),
-                    Guid = table.Column<string>(nullable: false),
-                    State = table.Column<string>(nullable: false)
+                    Token = table.Column<string>(),
+                    StaffId = table.Column<int>(),
+                    StaffName = table.Column<string>(),
+                    IpAddr = table.Column<string>(),
+                    Date = table.Column<DateTime>(),
+                    Guid = table.Column<string>(),
+                    State = table.Column<string>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LogonHistory", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_LogonHistory", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "ProjectInfo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
+                "ProjectInfo",
+                table => new {
+                    Id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Department = table.Column<string>(nullable: false),
-                    Description = table.Column<string>(nullable: false),
-                    Handler = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    OperateDateTime = table.Column<DateTime>(nullable: false),
-                    Operator = table.Column<string>(nullable: false),
-                    State = table.Column<string>(nullable: false)
+                    Department = table.Column<string>(),
+                    Description = table.Column<string>(),
+                    Handler = table.Column<string>(),
+                    Name = table.Column<string>(),
+                    OperateDateTime = table.Column<DateTime>(),
+                    Operator = table.Column<string>(),
+                    State = table.Column<string>()
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectInfo", x => x.Id);
-                });
+                constraints: table => { table.PrimaryKey("PK_ProjectInfo", x => x.Id); });
 
             migrationBuilder.CreateTable(
-                name: "ProjectAttachment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
+                "ProjectAttachment",
+                table => new {
+                    Id = table.Column<int>()
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false),
-                    Url = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(),
+                    Url = table.Column<string>(),
                     ProjectInfoId = table.Column<int>(nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_ProjectAttachment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProjectAttachment_ProjectInfo_ProjectInfoId",
-                        column: x => x.ProjectInfoId,
-                        principalTable: "ProjectInfo",
-                        principalColumn: "Id",
+                        "FK_ProjectAttachment_ProjectInfo_ProjectInfoId",
+                        x => x.ProjectInfoId,
+                        "ProjectInfo",
+                        "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectAttachment_ProjectInfoId",
-                table: "ProjectAttachment",
-                column: "ProjectInfoId");
+                "IX_ProjectAttachment_ProjectInfoId",
+                "ProjectAttachment",
+                "ProjectInfoId");
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
-                name: "LogonHistory");
+                "LogonHistory");
 
             migrationBuilder.DropTable(
-                name: "ProjectAttachment");
+                "ProjectAttachment");
 
             migrationBuilder.DropTable(
-                name: "ProjectInfo");
+                "ProjectInfo");
         }
     }
 }

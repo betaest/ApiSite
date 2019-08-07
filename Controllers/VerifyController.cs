@@ -1,11 +1,13 @@
 ﻿using ApiSite.Contexts;
 using ApiSite.Models;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ApiSite.Controllers {
-    [Route("v"), EnableCors("cors"), ApiController]
+    [Route("v")]
+    [EnableCors("cors")]
+    [ApiController]
     public class VerifyController : ControllerBase {
         #region Private Fields
 

@@ -58,7 +58,8 @@ namespace ApiSite.Contexts {
             }
         }
 
-        public bool HasGuid(string guid) =>
-            LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        public bool HasGuid(string guid) {
+            return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        }
     }
 }

@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace ApiSite.Controllers {
-    [Route("p"), EnableCors("cors"), ApiController]
+    [Route("p")]
+    [EnableCors("cors")]
+    [ApiController]
     public class ProjectController : ControllerBase {
         #region Public Constructors
 
@@ -60,7 +62,7 @@ namespace ApiSite.Controllers {
                 Operator = form["operator"],
                 OperateDateTime = DateTime.Now,
                 State = 'A',
-                Attachments = new List<ProjectAttachment>(),
+                Attachments = new List<ProjectAttachment>()
             };
 
             var files = new Dictionary<string, IFormFile>();
@@ -80,8 +82,9 @@ namespace ApiSite.Controllers {
 
             if (result)
                 foreach (var (url, file) in files)
-                    using (var fs = new FileStream($"{cfg.SavePath}/{url}", FileMode.Create))
+                    using (var fs = new FileStream($"{cfg.SavePath}/{url}", FileMode.Create)) {
                         file.CopyTo(fs);
+                    }
 
             return ReturnMessage(result);
         }

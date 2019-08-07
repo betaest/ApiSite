@@ -31,7 +31,7 @@ namespace ApiSite.Contexts {
                 var tokenString = Encoding.UTF8.GetString(Convert.FromBase64String(token));
                 var tk = JsonConvert.DeserializeObject<Token>(tokenString);
 
-                if (tk.TokenTime < DateTime.Now.AddHours(-6))
+                if (tk.TokenTime < DateTime.Now.AddMinutes(-5))
                     throw new ArgumentOutOfRangeException();
 
                 var guid = Guid.NewGuid().ToString();
@@ -51,7 +51,8 @@ namespace ApiSite.Contexts {
                 return new VerifyReturn {
                     Success = true,
                     Name = tk.StaffName,
-                    Guid = guid
+                    Guid = guid,
+                    To = tk.To
                 };
             } catch {
                 return failure;

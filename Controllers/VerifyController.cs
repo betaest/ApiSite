@@ -28,10 +28,16 @@ namespace ApiSite.Controllers {
         // GET: api/Verify
         [HttpGet("{token}")]
         public VerifyReturn Get(string token) {
-            Response.Cookies.Append("guid", token, new CookieOptions {
-                HttpOnly = true
-            });
-            return context.Verify(token);
+            var result = context.Verify(token);
+
+            if (result.Success) {
+                Response.Cookies.Delete("token");
+                Response.Cookies.Append("token", result.Guid, new CookieOptions {
+                    HttpOnly = true
+                });
+            }
+
+            return result;
         }
 
         #endregion Public Methods

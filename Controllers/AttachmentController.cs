@@ -65,7 +65,7 @@ namespace ApiSite.Controllers {
                     Response.StatusCode = 404;
                 }
 
-            return null;
+            return downloadFailure;
         }
 
         [HttpGet("all/{id}")]
@@ -76,12 +76,13 @@ namespace ApiSite.Controllers {
                 if (attachments != default && attachments.Count == 1)
                     return DownloadSingle($"{cfg.SavePath}/{attachments[0].Url}");
 
-                return DownloadZip(attachments.Select(a => ($"{cfg.SavePath}/{a.Url}", a.Name)));
+                if (attachments != default)
+                    return DownloadZip(attachments.Select(a => ($"{cfg.SavePath}/{a.Url}", a.Name)));
             } catch {
                 Response.StatusCode = 404;
             }
 
-            return null;
+            return downloadFailure;
         }
 
         [HttpDelete("{id}")]

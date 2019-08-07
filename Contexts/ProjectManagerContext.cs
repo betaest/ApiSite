@@ -75,10 +75,11 @@ namespace ApiSite.Contexts {
         public void DeleteFile(int id) {
             var attachment = ProjectAttachment.First(pa => pa.Id == id && pa.State == 'A');
 
-            if (attachment != default) {
-                attachment.State = 'X';
-                SaveChanges();
-            }
+            if (attachment == default)
+                return;
+
+            attachment.State = 'X';
+            SaveChanges();
         }
 
         public ProjectAttachment GetFile(int fileId) {

@@ -12,7 +12,7 @@ namespace ApiSite.Models {
         public string Token { get; set; }
 
         [Required]
-        public int StaffId { get; set; }
+        public string StaffId { get; set; }
 
         [Required]
         public string StaffName { get; set; }

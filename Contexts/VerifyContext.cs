@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using ApiSite.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace ApiSite.Contexts {
     public class VerifyContext : DbContext {
@@ -27,26 +28,29 @@ namespace ApiSite.Contexts {
             if (existed) return failure;
 
             try {
-                var guid = Guid.NewGuid().ToString();
+                var tokenString = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+                var tk = JsonConvert.DeserializeObject<Token>(tokenString);
 
-                var tokenString = Encoding.UTF8.GetString(Convert.FromBase64String(token))
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries);
+                if (tk.TokenTime < DateTime.Now.AddHours(-6))
+                    throw new ArgumentOutOfRangeException();
+
+                var guid = Guid.NewGuid().ToString();
 
                 LogonHistory.Add(new LogonHistory {
                     Token = token,
-                    StaffId = int.Parse(tokenString[0]),
-                    StaffName = tokenString[1],
-                    IpAddr = tokenString[2],
-                    Date = DateTime.Now,
+                    StaffId = tk.StaffId,
+                    StaffName = tk.StaffName,
+                    IpAddr = tk.IpAddress,
+                    Date = tk.TokenTime,
                     Guid = guid,
                     State = 'A'
                 });
 
-                this.SaveChanges();
+                SaveChanges();
 
                 return new VerifyReturn {
                     Success = true,
-                    Name = tokenString[1],
+                    Name = tk.StaffName,
                     Guid = guid
                 };
             } catch {

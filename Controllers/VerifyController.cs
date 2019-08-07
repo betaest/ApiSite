@@ -2,6 +2,7 @@
 using ApiSite.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace ApiSite.Controllers {
     [Route("v"), EnableCors("cors"), ApiController]
@@ -24,7 +25,10 @@ namespace ApiSite.Controllers {
 
         // GET: api/Verify
         [HttpGet("{token}")]
-        public ActionResult<VerifyReturn> Get(string token) {
+        public VerifyReturn Get(string token) {
+            Response.Cookies.Append("guid", token, new CookieOptions {
+                HttpOnly = true
+            });
             return context.Verify(token);
         }
 

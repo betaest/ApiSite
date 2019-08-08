@@ -26,8 +26,15 @@ namespace ApiSite.Controllers {
         #region Public Methods
 
         // GET: api/Verify
-        [HttpGet("{token}")]
-        public VerifyReturn Get(string token) {
+        [HttpGet("{token?}")]
+        public VerifyReturn Get(string token = null) {
+            var tk = Request.Cookies["token"];
+
+            if (!string.IsNullOrEmpty(tk))
+                return context.VerifyByGuid(tk);
+            else if (string.IsNullOrEmpty(token))
+                return new VerifyReturn { Success = false };                
+
             var result = context.Verify(token);
 
             if (result.Success) {

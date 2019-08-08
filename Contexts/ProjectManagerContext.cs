@@ -29,7 +29,7 @@ namespace ApiSite.Contexts {
 
         #region Private Properties
 
-        private DbSet<LogonHistory> LogonHistory { get; set; }
+        //private DbSet<LogonHistory> LogonHistory { get; set; }
         private DbSet<ProjectAttachment> ProjectAttachment { get; set; }
         private DbSet<ProjectInfo> ProjectInfo { get; set; }
 
@@ -123,9 +123,9 @@ namespace ApiSite.Contexts {
             return result;
         }
 
-        public bool HasGuid(string guid) {
-            return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
-        }
+        //public bool HasGuid(string guid) {
+        //    return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        //}
 
         public bool UpdateInfo(ProjectInfo info) {
             var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');

@@ -17,24 +17,24 @@ namespace ApiSite.Controllers {
     public class ProjectController : ControllerBase {
         #region Public Constructors
 
-        public ProjectController(IOptionsMonitor<ApiConf> cfg, ProjectManagerContext context) {
+        public ProjectController(IOptionsMonitor<ApiConf> cfg, ProjectManagerContext context, VerifyContext verify) {
             this.cfg = cfg.CurrentValue;
             this.context = context;
+            this.verify = verify;
         }
 
         #endregion Public Constructors
 
         #region Private Properties
 
-        private bool Verified
-        {
-            get
-            {
-                if (!Request.Cookies.ContainsKey("guid")) return false;
+        private bool Verified {
+            get {
+                var token = Request.Cookies["token"];
 
-                var guid = Request.Cookies["guid"];
+                if (string.IsNullOrEmpty(token))
+                    return false;
 
-                return context.HasGuid(guid);
+                return verify.VerifyByGuid(token).Success;
             }
         }
 
@@ -100,6 +100,7 @@ namespace ApiSite.Controllers {
 
         private readonly ApiConf cfg;
         private readonly ProjectManagerContext context;
+        private readonly VerifyContext verify;
 
         #endregion Private Fields
 

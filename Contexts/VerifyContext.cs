@@ -59,8 +59,21 @@ namespace ApiSite.Contexts {
             }
         }
 
-        public bool HasGuid(string guid) {
-            return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        //public bool HasGuid(string guid) {
+        //    return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
+        //}
+
+        public VerifyReturn VerifyByGuid(string guid) {
+            var token = LogonHistory.FirstOrDefault(l => l.State == 'A' && l.Guid == guid);
+
+            if (token == default)
+                return failure;
+
+            return new VerifyReturn {
+                Success = true,
+                Name = token.StaffName,
+                Guid = token.Guid
+            };
         }
     }
 }

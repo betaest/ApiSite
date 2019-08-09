@@ -2,6 +2,7 @@
 using ApiSite.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiSite.Controllers {
@@ -38,10 +39,11 @@ namespace ApiSite.Controllers {
             var result = context.Verify(token);
 
             if (result.Success) {
-                Response.Cookies.Delete("token");
+                //Response.Cookies.Delete("token");
                 Response.Cookies.Append("token", result.Guid, new CookieOptions {
-                    HttpOnly = true
-                });
+                    IsEssential = true,
+                    //HttpOnly = true,
+                }) ;
             }
 
             return result;

@@ -60,8 +60,8 @@ namespace ApiSite {
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
-                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
-                    //policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader()
+//                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+                    policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader()
                         .AllowCredentials()));
         }
 

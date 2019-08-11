@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using ApiSite.Models;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,7 @@ namespace ApiSite.Contexts {
 
         private DbSet<LogonHistory> LogonHistory { get; set; }
 
-        public VerifyReturn Verify(string token) {
+        public VerifyReturn Verify(string token, string ip = null) {
             var existed = LogonHistory.Any(l => l.Token == token && l.State == 'A');
 
             if (existed) return failure;
@@ -40,10 +42,9 @@ namespace ApiSite.Contexts {
                     Token = token,
                     StaffId = tk.StaffId,
                     StaffName = tk.StaffName,
-                    IpAddr = tk.IpAddress,
+                    IpAddr = ip ?? tk.IpAddress,
                     Date = tk.TokenTime,
-                    Guid = guid,
-                    State = 'A'
+                    Guid = guid
                 });
 
                 SaveChanges();
@@ -59,12 +60,8 @@ namespace ApiSite.Contexts {
             }
         }
 
-        //public bool HasGuid(string guid) {
-        //    return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
-        //}
-
         public VerifyReturn VerifyByGuid(string guid) {
-            var token = LogonHistory.FirstOrDefault(l => l.State == 'A' && l.Guid == guid);
+            var token = LogonHistory.FirstOrDefault(l => l.Guid == guid);
 
             if (token == default)
                 return failure;

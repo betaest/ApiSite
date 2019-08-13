@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ApiSite.Models {
+namespace ApiSite.Models.ProjectManager {
     public class ProjectAttachment {
         #region Public Properties
 

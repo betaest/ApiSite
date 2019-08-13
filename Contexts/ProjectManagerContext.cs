@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ApiSite.Models;
+using ApiSite.Models.ProjectManager;
 using ApiSite.Utils;
 using Microsoft.EntityFrameworkCore;
 

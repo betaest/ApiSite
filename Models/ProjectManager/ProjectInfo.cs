@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ApiSite.Models {
+namespace ApiSite.Models.ProjectManager {
     public class ProjectInfo {
         #region Public Properties
 

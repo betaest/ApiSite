@@ -1,5 +1,5 @@
-﻿using System;
-using ApiSite.Contexts;
+﻿using ApiSite.Contexts;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+
+using System;
 
 namespace ApiSite {
     public class Startup {
         #region Private Fields
 
-        private static readonly LoggerFactory factory = new LoggerFactory(new[] {new DebugLoggerProvider()});
+        private static readonly LoggerFactory factory = new LoggerFactory(new[] { new DebugLoggerProvider() });
 
         #endregion Private Fields
 
@@ -55,12 +58,14 @@ namespace ApiSite {
                             mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb))
                         .UseLoggerFactory(factory))
                 .AddDbContext<VerifyContext>(o => o.UseMySql(verify,
+                    mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)))
+                .AddDbContext<BillQueryContext>(o => o.UseMySql(verify,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
-//                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+                    //                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
                     policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader()
                         .AllowCredentials()));
         }

@@ -1,6 +1,6 @@
-﻿using System;
-using ApiSite.Contexts;
+﻿using ApiSite.Contexts;
 using ApiSite.Models;
+
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +33,6 @@ namespace ApiSite.Controllers {
 
             if (!string.IsNullOrEmpty(tk))
                 return context.VerifyByGuid(tk);
-
             else if (string.IsNullOrEmpty(token))
                 return new VerifyReturn { Success = false };
 

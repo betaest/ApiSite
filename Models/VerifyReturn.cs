@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ApiSite.Models {
+﻿namespace ApiSite.Models {
     public class VerifyReturn {
         #region Public Properties
 

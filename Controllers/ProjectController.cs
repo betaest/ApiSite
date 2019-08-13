@@ -28,8 +28,10 @@ namespace ApiSite.Controllers {
 
         #region Private Properties
 
-        private bool Verified {
-            get {
+        private bool Verified
+        {
+            get
+            {
                 var token = Request.Cookies["token"];
 
                 if (string.IsNullOrEmpty(token))

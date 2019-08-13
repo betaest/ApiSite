@@ -8,7 +8,7 @@ namespace ApiSite.Models.BillQuery {
         public Dictionary<string, object> Footer { get; set; }
         public List<ColumnInfo> Header { get; set; }
         public List<DynamicText> Title { get; set; }
-        public int Total { get; set; }  
+        public int Total { get; set; }
 
         #endregion Public Properties
     }

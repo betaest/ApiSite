@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ApiSite.Models.BillQuery;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiSite.Contexts {
     public class BillQueryContext : DbContext {
@@ -11,7 +12,7 @@ namespace ApiSite.Contexts {
 
         #region Public Properties
 
-        public DbSet<Models.BillQuery.ColumnInfo> ColumnInfo { get; set; }
+        public DbSet<ColumnInfo> ColumnInfo { get; set; }
         //public DbSet<Models.BillQuery.DynamicText> DynamicText { get; set; }
         //public DbSet<Models.BillQuery.Method> Method { get; set; }
         //public DbSet<Models.BillQuery.Connection> Connection { get; set; }

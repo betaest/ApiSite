@@ -1,6 +1,5 @@
 ﻿using ApiSite.Contexts;
 using ApiSite.Models;
-
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,17 +32,16 @@ namespace ApiSite.Controllers {
 
             if (!string.IsNullOrEmpty(tk))
                 return context.VerifyByGuid(tk);
-            else if (string.IsNullOrEmpty(token))
-                return new VerifyReturn { Success = false };
+            if (string.IsNullOrEmpty(token))
+                return new VerifyReturn {Success = false};
 
             var result = context.Verify(token, HttpContext.Connection.RemoteIpAddress.ToString());
 
-            if (result.Success) {
+            if (result.Success)
                 Response.Cookies.Append("token", result.Guid, new CookieOptions {
                     IsEssential = true,
-                    HttpOnly = true,
+                    HttpOnly = true
                 });
-            }
 
             return result;
         }

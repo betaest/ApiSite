@@ -7,11 +7,11 @@ namespace ApiSite.Models.BillQuery {
 
         [Required] public int Id { get; set; }
 
+        [Required] public string Title { get; set; }
+
         [Required] public virtual Method Method { get; set; }
 
-        [Required] public string Params { get; set; }
-
-        [Required] public virtual IEnumerable<DynamicText> Title { get; set; }
+        public virtual IEnumerable<DynamicText> ResultTitle { get; set; }
 
         #endregion Public Properties
     }

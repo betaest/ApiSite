@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ApiSite.Models.BillQuery {
     public class DynamicText {
@@ -7,9 +6,9 @@ namespace ApiSite.Models.BillQuery {
 
         [Required] public int Id { get; set; }
 
-        public IEnumerable<Method> Params { get; set; }
-
         [Required] public string Type { get; set; }
+
+        [Required] public string Props { get; set; }
 
         #endregion Public Properties
     }

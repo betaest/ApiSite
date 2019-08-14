@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
 namespace ApiSite.Models.BillQuery {
-    public class ResultInfo {
+    public class Result {
         #region Public Properties
 
+        public List<object> Title { get; set; }
+        public List<Column> Header { get; set; }
         public List<Dictionary<string, object>> Body { get; set; }
         public Dictionary<string, object> Footer { get; set; }
-        public List<ColumnInfo> Header { get; set; }
-        public List<DynamicText> Title { get; set; }
         public int Total { get; set; }
 
         #endregion Public Properties

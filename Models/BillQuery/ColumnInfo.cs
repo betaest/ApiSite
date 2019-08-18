@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace ApiSite.Models.BillQuery {
+    [Table("column")]
     public class ColumnInfo {
         #region Public Properties
 
-        [Required] public int Id { get; set; }
-        [Required] public string Key { get; set; }
+        [Key] [Required] public string Key { get; set; }
+
         [Required] public virtual string Title { get; set; }
         public virtual IEnumerable<FieldMenuItem> Menu { get; set; }
         public bool Sortable { get; set; }
@@ -17,7 +17,8 @@ namespace ApiSite.Models.BillQuery {
 
         public int Width { get; set; }
 
-        public Column ToResult() =>
+        [NotMapped]
+        public Column Result =>
             new Column {
                 Title = Title,
                 Menu = Menu.ToDictionary(m => m.Id, m => m.Title),

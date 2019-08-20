@@ -1,11 +1,29 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace ApiSite.Models.BillQuery {
+    [Table("column")]
     public class Column {
-        public string Key { get; set; }
-        public string Title { get; set; }
+        #region Public Properties
+
+        [Key] [Required] public string Key { get; set; }
+        [Required] public virtual string Title { get; set; }
+        public virtual IEnumerable<MenuItem> Menu { get; set; }
         public bool Sortable { get; set; }
         public int Width { get; set; }
-        public Dictionary<int, string> Menu { get; set; }
+
+        [NotMapped]
+        public JsColumn Result =>
+            new JsColumn {
+                Key = Key,
+                Title = Title,
+                Sortable = Sortable,
+                Width = Width,
+                Menu = Menu.ToDictionary(m => m.Id, m => m.Text),
+            };
+
+        #endregion Public Properties
     }
 }

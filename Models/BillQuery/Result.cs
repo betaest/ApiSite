@@ -1,15 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiSite.Models.BillQuery {
+    public enum ResultType {
+        Normal,
+        Expandable,
+    }
+
     public class Result {
-        #region Public Properties
+        [Required] public int Id { get; set; }
 
-        public List<object> Title { get; set; }
-        public List<Column> Header { get; set; }
-        public List<Dictionary<string, object>> Body { get; set; }
-        public Dictionary<string, object> Footer { get; set; }
-        public int Total { get; set; }
+        public ResultType Type { get; set; }
 
-        #endregion Public Properties
+        public Value Value { get; set; }
+
+        public IEnumerable<Result> Children { get; set; }
     }
 }

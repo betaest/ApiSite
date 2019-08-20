@@ -2,20 +2,18 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models.BillQuery {
-    public enum Return {
-        VariantObject,
-        InvariantObject,
-        VariantOracle,
-        InvariantOracle,
+    public enum ValueType {
+        Const,
+        Varient,
     }
 
-    [Table("compute_value")]
-    public class ComputeValue {
+    [Table("value")]
+    public class Value {
         #region Public Properties
 
         [Required] public int Id { get; set; }
 
-        [Required] public Return Type { get; set; }
+        [Required] public ValueType Type { get; set; }
 
         /// <summary>
         /// JSON values
@@ -25,9 +23,9 @@ namespace ApiSite.Models.BillQuery {
         ///     "value": "12345",
         /// }
         /// </summary>
-        [Required] public string Value { get; set; }
+        [Required] public string Result { get; set; }
 
-        public string Connection { get; set; }
+        public Connection Connection { get; set; }
 
         #endregion Public Properties
     }

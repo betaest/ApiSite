@@ -10,7 +10,6 @@ namespace ApiSite.Models.BillQuery {
 
         [Key] [Required] public string Key { get; set; }
         [Required] public virtual string Title { get; set; }
-        public virtual IEnumerable<MenuItem> Menu { get; set; }
         public bool Sortable { get; set; }
         public int Width { get; set; }
 
@@ -21,9 +20,8 @@ namespace ApiSite.Models.BillQuery {
                 Title = Title,
                 Sortable = Sortable,
                 Width = Width,
-                Menu = Menu.ToDictionary(m => m.Id, m => m.Text),
             };
 
-        #endregion Public Properties
+        #endregion Public Properties 
     }
 }

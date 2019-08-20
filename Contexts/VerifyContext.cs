@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ApiSite.Contexts {
     public class VerifyContext : DbContext {
-        private static readonly VerifyReturn failure = new VerifyReturn {
+        private static readonly JsVerifyResult failure = new JsVerifyResult {
             Success = false,
             Name = string.Empty,
             Guid = string.Empty
@@ -20,10 +20,10 @@ namespace ApiSite.Contexts {
 
         #endregion Public Constructors
 
-        private DbSet<LogonHistory> LogonHistory { get; set; }
+        private DbSet<LogonHistory> LogonHistories { get; set; }
 
-        public VerifyReturn Verify(string token, string ip = null) {
-            var existed = LogonHistory.Any(l => l.Token == token && l.State == 'A');
+        public JsVerifyResult Verify(string token, string ip = null) {
+            var existed = LogonHistories.Any(l => l.Token == token);
 
             if (existed) return failure;
 
@@ -36,7 +36,7 @@ namespace ApiSite.Contexts {
 
                 var guid = Guid.NewGuid().ToString();
 
-                LogonHistory.Add(new LogonHistory {
+                LogonHistories.Add(new LogonHistory {
                     Token = token,
                     StaffId = tk.StaffId,
                     StaffName = tk.StaffName,
@@ -47,7 +47,7 @@ namespace ApiSite.Contexts {
 
                 SaveChanges();
 
-                return new VerifyReturn {
+                return new JsVerifyResult {
                     Success = true,
                     Name = tk.StaffName,
                     Guid = guid,
@@ -58,13 +58,13 @@ namespace ApiSite.Contexts {
             }
         }
 
-        public VerifyReturn VerifyByGuid(string guid) {
-            var token = LogonHistory.FirstOrDefault(l => l.Guid == guid);
+        public JsVerifyResult VerifyByGuid(string guid) {
+            var token = LogonHistories.FirstOrDefault(l => l.Guid == guid);
 
             if (token == default)
                 return failure;
 
-            return new VerifyReturn {
+            return new JsVerifyResult {
                 Success = true,
                 Name = token.StaffName,
                 Guid = token.Guid

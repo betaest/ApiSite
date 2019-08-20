@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models.ProjectManager {
-    public class ProjectAttachment {
+    [Table("attachment")]
+    public class Attachment {
         #region Public Properties
 
         public int Id { get; set; }

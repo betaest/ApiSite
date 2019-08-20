@@ -14,7 +14,7 @@ namespace ApiSite {
     public class Startup {
         #region Private Fields
 
-        private static readonly LoggerFactory factory = new LoggerFactory(new[] {new DebugLoggerProvider()});
+        private static readonly LoggerFactory factory = new LoggerFactory(new[] { new DebugLoggerProvider() });
 
         #endregion Private Fields
 
@@ -49,6 +49,7 @@ namespace ApiSite {
         public void ConfigureServices(IServiceCollection services) {
             var conn = Configuration.GetConnectionString("ApiSite");
             var verify = Configuration.GetConnectionString("Verify");
+            var billquery = Configuration.GetConnectionString("BillQuery");
 
             services.AddDbContext<ProjectManagerContext>(o =>
                     o.UseMySql(conn,
@@ -56,14 +57,17 @@ namespace ApiSite {
                         .UseLoggerFactory(factory))
                 .AddDbContext<VerifyContext>(o => o.UseMySql(verify,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)))
-                .AddDbContext<BillQueryContext>(o => o.UseMySql(verify,
+                .AddDbContext<BillQueryContext>(o => o.UseMySql(billquery,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));
             services.AddCors(setup =>
                 setup.AddPolicy("cors",
-                    //                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+#if DEBUG
+                    policy => policy.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+#else
                     policy => policy.WithOrigins("http://132.232.28.32:8080").AllowAnyMethod().AllowAnyHeader()
+#endif
                         .AllowCredentials()));
         }
 

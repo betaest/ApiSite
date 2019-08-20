@@ -13,9 +13,7 @@ namespace ApiSite.Contexts {
         #region Public Properties
 
         public DbSet<Column> Columns { get; set; }
-        //public DbSet<Models.BillQuery.DynamicText> DynamicText { get; set; }
-        //public DbSet<Models.BillQuery.Method> Method { get; set; }
-        //public DbSet<Models.BillQuery.Connection> Connection { get; set; }
+        public DbSet<MenuItem> MenuItems { get; set; }
 
         #endregion Public Properties
     }

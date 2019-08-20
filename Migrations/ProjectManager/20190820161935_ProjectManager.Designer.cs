@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace ApiSite.Migrations
+namespace ApiSite.Migrations.ProjectManager
 {
     [DbContext(typeof(ProjectManagerContext))]
-    [Migration("20190722160233_V2")]
-    partial class V2
+    [Migration("20190820161935_ProjectManager")]
+    partial class ProjectManager
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,37 +19,7 @@ namespace ApiSite.Migrations
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("ApiSite.Models.LogonHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("Date");
-
-                    b.Property<string>("Guid")
-                        .IsRequired();
-
-                    b.Property<string>("IpAddr")
-                        .IsRequired();
-
-                    b.Property<int>("StaffId");
-
-                    b.Property<string>("StaffName")
-                        .IsRequired();
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasConversion(new ValueConverter<string, string>(v => default(string), v => default(string), new ConverterMappingHints(size: 1)));
-
-                    b.Property<string>("Token")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LogonHistory");
-                });
-
-            modelBuilder.Entity("ApiSite.Models.ProjectAttachment", b =>
+            modelBuilder.Entity("ApiSite.Models.ProjectManager.Attachment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -57,19 +27,25 @@ namespace ApiSite.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<int?>("ProjectInfoId");
+                    b.Property<int?>("ProjectId");
+
+                    b.Property<int>("ProjectInfoId");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasConversion(new ValueConverter<string, string>(v => default(string), v => default(string), new ConverterMappingHints(size: 1)));
 
                     b.Property<string>("Url")
                         .IsRequired();
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectInfoId");
+                    b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectAttachment");
+                    b.ToTable("attachment");
                 });
 
-            modelBuilder.Entity("ApiSite.Models.ProjectInfo", b =>
+            modelBuilder.Entity("ApiSite.Models.ProjectManager.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -97,14 +73,14 @@ namespace ApiSite.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectInfo");
+                    b.ToTable("project");
                 });
 
-            modelBuilder.Entity("ApiSite.Models.ProjectAttachment", b =>
+            modelBuilder.Entity("ApiSite.Models.ProjectManager.Attachment", b =>
                 {
-                    b.HasOne("ApiSite.Models.ProjectInfo", "ProjectInfo")
+                    b.HasOne("ApiSite.Models.ProjectManager.Project")
                         .WithMany("Attachments")
-                        .HasForeignKey("ProjectInfoId");
+                        .HasForeignKey("ProjectId");
                 });
 #pragma warning restore 612, 618
         }

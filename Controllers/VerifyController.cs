@@ -27,13 +27,13 @@ namespace ApiSite.Controllers {
 
         // GET: api/Verify
         [HttpGet("{token?}")]
-        public VerifyReturn Get(string token = null) {
+        public JsVerifyResult Get(string token = null) {
             var tk = Request.Cookies["token"];
 
             if (!string.IsNullOrEmpty(tk))
                 return context.VerifyByGuid(tk);
             if (string.IsNullOrEmpty(token))
-                return new VerifyReturn {Success = false};
+                return new JsVerifyResult {Success = false};
 
             var result = context.Verify(token, HttpContext.Connection.RemoteIpAddress.ToString());
 

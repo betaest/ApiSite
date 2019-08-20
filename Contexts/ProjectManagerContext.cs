@@ -30,16 +30,16 @@ namespace ApiSite.Contexts {
         #region Private Properties
 
         //private DbSet<LogonHistory> LogonHistory { get; set; }
-        private DbSet<ProjectAttachment> ProjectAttachment { get; set; }
-        private DbSet<ProjectInfo> ProjectInfo { get; set; }
+        private DbSet<Attachment> Attachments { get; set; }
+        private DbSet<Project> Projects { get; set; }
 
         #endregion Private Properties
 
         #region Public Methods
 
-        public bool AddInfo(ProjectInfo info) {
+        public bool AddInfo(Project info) {
             try {
-                ProjectInfo.Add(info);
+                Projects.Add(info);
 
                 SaveChanges();
 
@@ -53,7 +53,7 @@ namespace ApiSite.Contexts {
 
         public bool DeleteById(int id) {
             try {
-                var info = ProjectInfo.First(p => p.Id == id && p.State == 'A');
+                var info = Projects.First(p => p.Id == id && p.State == 'A');
 
                 if (info == null)
                     return false;
@@ -73,7 +73,7 @@ namespace ApiSite.Contexts {
         }
 
         public void DeleteFile(int id) {
-            var attachment = ProjectAttachment.First(pa => pa.Id == id && pa.State == 'A');
+            var attachment = Attachments.First(pa => pa.Id == id && pa.State == 'A');
 
             if (attachment == default)
                 return;
@@ -82,17 +82,17 @@ namespace ApiSite.Contexts {
             SaveChanges();
         }
 
-        public ProjectAttachment GetFile(int fileId) {
-            return ProjectAttachment.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
+        public Attachment GetFile(int fileId) {
+            return Attachments.FirstOrDefault(pa => pa.Id == fileId && pa.State == 'A');
         }
 
-        public List<ProjectAttachment> GetFiles(int id) {
-            return ProjectAttachment.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
+        public List<Attachment> GetFiles(int id) {
+            return Attachments.Where(pa => pa.State == 'A' && pa.ProjectInfoId == id).ToList();
         }
 
-        public IEnumerable<ProjectInfo> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
+        public IEnumerable<Project> GetInfoByKeyword(int page, int pageSize, string sorter, string order,
             string keyword) {
-            var result = ProjectInfo.Include(p => p.Attachments).Where(p => p.State == 'A');
+            var result = Projects.Include(p => p.Attachments).Where(p => p.State == 'A');
 
             if (!string.IsNullOrEmpty(keyword)) {
                 var ks = keyword.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -127,10 +127,10 @@ namespace ApiSite.Contexts {
         //    return LogonHistory.Any(l => l.State == 'A' && l.Guid == guid);
         //}
 
-        public bool UpdateInfo(ProjectInfo info) {
-            var pr = ProjectInfo.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');
+        public bool UpdateInfo(Project info) {
+            var pr = Projects.FirstOrDefault(p => p.Id == info.Id && p.State == 'A');
 
-            if (pr == default(ProjectInfo)) return false;
+            if (pr == default(Project)) return false;
 
             try {
                 pr.Name = info.Name;

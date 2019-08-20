@@ -1,5 +1,5 @@
 ﻿namespace ApiSite.Models {
-    public class MessageResult {
+    public class JsResult {
         #region Public Properties
 
         public string Message { get; set; }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models.ProjectManager {
-    public class ProjectInfo {
+    [Table("project")]
+    public class Project {
         #region Public Properties
 
-        public virtual ICollection<ProjectAttachment> Attachments { get; set; }
+        public virtual ICollection<Attachment> Attachments { get; set; }
 
         [Required] public string Department { get; set; }
 

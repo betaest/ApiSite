@@ -13,6 +13,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20190820160103_Verify.cs" />
+    <Compile Remove="Migrations\20190820160103_Verify.Designer.cs" />
+    <Compile Remove="Migrations\ProjectManager\20190820160144_ProjectManager.cs" />
+    <Compile Remove="Migrations\ProjectManager\20190820160144_ProjectManager.Designer.cs" />
+    <Compile Remove="Migrations\ProjectManager\20190820160351_ProjectManager.cs" />
+    <Compile Remove="Migrations\ProjectManager\20190820160351_ProjectManager.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

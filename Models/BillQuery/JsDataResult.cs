@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace ApiSite.Models.BillQuery {
-    public class JsResult {
+    public class JsDataResult {
         #region Public Properties
 
         public List<object> Title { get; set; }

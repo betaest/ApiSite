@@ -14,7 +14,7 @@ namespace ApiSite.Controllers {
     [EnableCors("cors")]
     [ApiController]
     public class AttachmentController : ControllerBase {
-        private static readonly MessageResult downloadFailure = new MessageResult {
+        private static readonly JsResult downloadFailure = new JsResult {
             Success = false,
             Message = "下载文件未找到"
         };

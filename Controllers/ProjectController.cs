@@ -45,18 +45,18 @@ namespace ApiSite.Controllers {
 
         #region Private Methods
 
-        private static MessageResult ReturnMessage(bool success) {
-            return new MessageResult {
+        private static JsResult ReturnMessage(bool success) {
+            return new JsResult {
                 Success = success,
                 Message = success ? "提交数据成功" : "提交数据失败"
             };
         }
 
         [NonAction]
-        private MessageResult PostOrPutContent(IFormCollection form, Func<ProjectInfo, bool> callback) {
+        private JsResult PostOrPutContent(IFormCollection form, Func<Project, bool> callback) {
             if (!Verified) return verifyError;
 
-            var info = new ProjectInfo {
+            var info = new Project {
                 Id = int.TryParse(form["id"], out var id) ? id : default,
                 Name = form["name"],
                 Department = form["department"],
@@ -65,7 +65,7 @@ namespace ApiSite.Controllers {
                 Operator = form["operator"],
                 OperateDateTime = DateTime.Now,
                 State = 'A',
-                Attachments = new List<ProjectAttachment>()
+                Attachments = new List<Attachment>()
             };
 
             var files = new Dictionary<string, IFormFile>();
@@ -73,7 +73,7 @@ namespace ApiSite.Controllers {
             foreach (var file in form.Files) {
                 var name = Path.GetFileName(file.FileName);
                 var url = $"{Helper.GenerateFilename(cfg.NameRule)}{Path.GetExtension(name)}";
-                info.Attachments.Add(new ProjectAttachment {
+                info.Attachments.Add(new Attachment {
                     Name = name,
                     Url = url,
                     State = 'A'
@@ -96,7 +96,7 @@ namespace ApiSite.Controllers {
 
         #region Private Fields
 
-        private static readonly MessageResult verifyError = new MessageResult {
+        private static readonly JsResult verifyError = new JsResult {
             Success = false,
             Message = "身份验证失败，请重新登录"
         };
@@ -111,7 +111,7 @@ namespace ApiSite.Controllers {
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public MessageResult Delete(int id) {
+        public JsResult Delete(int id) {
             if (!Verified) return verifyError;
 
             var success = context.DeleteById(id);
@@ -121,18 +121,18 @@ namespace ApiSite.Controllers {
 
         // GET api/values
         [HttpGet("{keyword?}")]
-        public ProjectInfoReturn Get(string keyword = "", int page = 1, int pageSize = 10,
+        public JsDataResult Get(string keyword = "", int page = 1, int pageSize = 10,
             string sorter = "", string order = "normal") {
             if (!Verified)
-                return new ProjectInfoReturn {
+                return new JsDataResult {
                     Total = 0,
 
-                    Rows = new ProjectInfo[0]
+                    Rows = new Project[0]
                 };
 
             var row = context.GetInfoByKeyword(page - 1, pageSize, sorter, order, keyword).ToList();
 
-            return new ProjectInfoReturn {
+            return new JsDataResult {
                 Total = row.Count,
                 Rows = row
             };
@@ -140,13 +140,13 @@ namespace ApiSite.Controllers {
 
         // POST
         [HttpPost]
-        public MessageResult Post([FromForm] IFormCollection form) {
+        public JsResult Post([FromForm] IFormCollection form) {
             return PostOrPutContent(form, context.AddInfo);
         }
 
         // PUT
         [HttpPut]
-        public MessageResult Put([FromForm] IFormCollection form) {
+        public JsResult Put([FromForm] IFormCollection form) {
             return PostOrPutContent(form, context.UpdateInfo);
         }
 

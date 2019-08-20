@@ -1,5 +1,5 @@
 ﻿namespace ApiSite.Models {
-    public class VerifyReturn {
+    public class JsVerifyResult {
         #region Public Properties
 
         public string Name { get; set; }

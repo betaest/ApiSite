@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models {
+    [Table("logon_history")]
     public class LogonHistory {
         #region Public Properties
 
@@ -19,7 +21,7 @@ namespace ApiSite.Models {
 
         [Required] public string Guid { get; set; }
 
-        [Required] public char State { get; set; }
+//        [Required] public char State { get; set; }
 
         #endregion Public Properties
     }

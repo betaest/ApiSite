@@ -6,6 +6,5 @@ namespace ApiSite.Models.BillQuery {
         public string Title { get; set; }
         public bool Sortable { get; set; }
         public int Width { get; set; }
-        public Dictionary<int, string> Menu { get; set; }
     }
 }

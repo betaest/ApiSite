@@ -11,6 +11,8 @@ namespace ApiSite.Models.BillQuery {
 
         [Required] public string Text { get; set; }
 
+        [Required] public Column Column { get; set; }
+
         public virtual Result Result { get; set; }
 
         #endregion Public Properties

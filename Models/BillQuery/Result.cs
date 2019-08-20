@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models.BillQuery {
     public enum ResultType {
@@ -7,12 +8,13 @@ namespace ApiSite.Models.BillQuery {
         Expandable,
     }
 
+    [Table("result")]
     public class Result {
         [Required] public int Id { get; set; }
 
-        public ResultType Type { get; set; }
+        [Required] public ResultType Type { get; set; }
 
-        public Value Value { get; set; }
+        [Required] public Value Value { get; set; }
 
         public IEnumerable<Result> Children { get; set; }
     }

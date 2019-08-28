@@ -49,7 +49,7 @@ namespace ApiSite {
         public void ConfigureServices(IServiceCollection services) {
             var conn = Configuration.GetConnectionString("ApiSite");
             var verify = Configuration.GetConnectionString("Verify");
-            var billquery = Configuration.GetConnectionString("BillQuery");
+            var billQuery = Configuration.GetConnectionString("BillQuery");
 
             services.AddDbContext<ProjectManagerContext>(o =>
                     o.UseMySql(conn,
@@ -57,7 +57,7 @@ namespace ApiSite {
                         .UseLoggerFactory(factory))
                 .AddDbContext<VerifyContext>(o => o.UseMySql(verify,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)))
-                .AddDbContext<BillQueryContext>(o => o.UseMySql(billquery,
+                .AddDbContext<BillQueryContext>(o => o.UseMySql(billQuery,
                     mySqlOptions => mySqlOptions.ServerVersion(new Version(10, 4, 6), ServerType.MariaDb)));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.Configure<ApiConf>(Configuration.GetSection("Settings"));

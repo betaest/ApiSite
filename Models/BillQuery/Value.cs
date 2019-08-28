@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiSite.Models.BillQuery {
     public enum ValueType {
         Const,
-        Varient,
+        Variant,
     }
 
     [Table("value")]
@@ -26,6 +27,8 @@ namespace ApiSite.Models.BillQuery {
         [Required] public string Result { get; set; }
 
         public Connection Connection { get; set; }
+
+        [NotMapped] public string FuncName { get; } = $"F${Guid.NewGuid():N}";
 
         #endregion Public Properties
     }
